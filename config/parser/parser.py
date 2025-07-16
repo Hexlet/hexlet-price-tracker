@@ -51,11 +51,15 @@ async def tg_parser(url: str, client: TelegramClient, limit: int = 10) -> dict:
                                         for post in last_messages[:limit]]
         total_views = 0
         total_posts = 0
-        for post in last_messages:
-            total_views += post.views
-            total_posts += 1
-        average_views = total_views // total_posts
-        data['average_views'] = average_views
+
+        if last_messages is not None:
+            for post in last_messages:
+                if post.views:
+                    total_views += post.views
+                    total_posts += 1
+            average_views = total_views // total_posts
+            data['average_views'] = average_views
+
 
     except FloodWaitError as e:
         log.error(f'Сработал антифлуд, нужно подождать')
@@ -70,6 +74,9 @@ async def tg_parser(url: str, client: TelegramClient, limit: int = 10) -> dict:
 
     except AuthKeyError:
         log.critical(f'Проблемы с сессией авторизации')
+
+    #except Exception as e:
+        #print(f"Ошибка: {e}")
 
     if channel:
 
@@ -103,4 +110,5 @@ async def tg_parser(url: str, client: TelegramClient, limit: int = 10) -> dict:
                 }]
 
     log.debug(f'Канал успешно спарсился: {data}')
+
     return data

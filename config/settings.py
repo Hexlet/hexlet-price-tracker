@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from .logging import LOGGING
 import os
 
 from django.core.exceptions import ImproperlyConfigured
