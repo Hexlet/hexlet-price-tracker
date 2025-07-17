@@ -7,14 +7,12 @@ const App: React.FC = () => {
   return (
     <Router>
       <Layout>
-        <Routes>
           {renderRoutes()}
-        </Routes>
+        {/* <Routes>
+        </Routes> */}
       </Layout>
     </Router>
   );
 };
 
 export default App;
-
-

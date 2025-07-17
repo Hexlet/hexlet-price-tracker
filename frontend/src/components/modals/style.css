@@ -1,0 +1,34 @@
+.password-recovery {
+    max-width: 400px;
+    border-radius: 17px;
+    padding: 20px 25px 60px;
+    background-color: red;
+}
+
+.password-recovery__close {
+    position: relative;
+}
+
+
+
+.password-recovery__title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.password-recovery__label {
+    display: flex;
+    flex-direction: column;
+}
+
+.password-recovery__input {
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 7px 0 7px 12px;
+}
+
+.password-recovery__actions {
+    display: flex;
+    justify-content: space-between;
+}
