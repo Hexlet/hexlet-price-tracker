@@ -3,6 +3,8 @@ from django.contrib.auth.forms import (
     AuthenticationForm,
     UserChangeForm,
     UserCreationForm,
+    PasswordResetForm,
+    SetPasswordForm,
 )
 
 from .models import User
@@ -162,4 +164,23 @@ class AvatarChange(UserChangeForm):
                                       'name': 'avatar_image',
                                       'class': 'form-control',
                                       'placeholder': 'https://example.com/avatar.jpg'})
+    )
+
+class RestorePasswordRequestForm(PasswordResetForm):
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={'class': 'form-control',
+                                       'placeholder': 'Пожалуйста, введите ваш email'})
+    )
+
+class RestorePasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label='Новый пароль',
+        widget=forms.PasswordInput(attrs={'class': 'form-control',
+                                          'placeholder': 'Новый пароль'})
+    )
+    new_password2 = forms.CharField(
+        label='Подтверждение пароля',
+        widget=forms.PasswordInput(attrs={'class': 'form-control',
+                                          'placeholder': 'Подтверждение пароля'})
     )

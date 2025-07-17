@@ -2,6 +2,9 @@ from django.contrib import auth, messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic.base import View
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+
 
 from config.group_channels.forms import CreateGroupForm, UpdateGroupForm
 
@@ -10,6 +13,8 @@ from .forms import (
     UserLoginForm,
     UserRegForm,
     UserUpdateForm,
+    RestorePasswordRequestForm,
+    RestorePasswordForm,
 )
 from .models import User
 
@@ -224,3 +229,138 @@ class AvatarChangeView(View):
                                  messages.ERROR,
                                  avatar_url[1:])
         return redirect(reverse('users:profile'))
+    
+
+class RestorePasswordRequestView(View):
+    def get(self, request, *args, **kwargs):
+        form = RestorePasswordRequestForm()
+        return render(
+            request,
+            'users/restore-password-request.html',
+            {'form': form}
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = RestorePasswordRequestForm(data=request.POST)
+        if form.is_valid():
+            form.save(request=request,
+                      use_https=request.is_secure(),
+                      email_template_name='emails/restore-password-email.html',
+            )
+            messages.add_message(request,
+                                 messages.SUCCESS,
+                                 'Ссылка на восстановление пароля \
+                                    отправлена на указанный вами Email'
+            )
+            return redirect('users:login') # redirect already uses reverse
+        
+        messages.add_message(request,
+                             messages.ERROR,
+                             'Пожалуйста, введите корректный Email'
+        )
+        return render(request,
+                      'users/restore-password-request.html',
+                      {'form': form}
+        )
+
+class RestorePasswordView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            uid = kwargs['uidb64']
+        except KeyError:
+            uid = None
+        try:
+            token = kwargs['token']
+        except KeyError:
+            token = None
+        
+        if uid is None or token is None:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Некорректная ссылка для восстановления пароля')
+            return redirect('users:login')
+        
+        try:
+            uid_decoded = urlsafe_base64_decode(uid).decode()
+        except TypeError:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Некорректный id пользователя')
+            return redirect('users:login')
+        try:
+            user = User.objects.get(pk=uid_decoded)
+        except User.DoesNotExist:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Пользователь не найден')
+            return redirect('users:login')
+        
+        if not default_token_generator.check_token(user, token):
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Некорректная ссылка для восстановления пароля')
+            return redirect('users:login')
+        
+        form = RestorePasswordForm(user=user)
+        return render(
+            request,
+            'users/restore-password.html',
+            {'form': form,
+             'uid': uid,
+             'token': token,
+            }
+        )
+
+    def post(self, request, *args, **kwargs):
+        try:
+            uid = kwargs['uidb64']
+        except KeyError:
+            uid = None
+        try:
+            token = kwargs['token']
+        except KeyError:
+            token = None
+        
+        if uid is None or token is None:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Некорректная ссылка для восстановления пароля')
+            return redirect('users:login')
+        
+        try:
+            uid_decoded = urlsafe_base64_decode(uid).decode()
+        except TypeError:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Некорректный id пользователя')
+            return redirect('users:login')
+        try:
+            user = User.objects.get(pk=uid_decoded)
+        except User.DoesNotExist:
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Пользователь не найден')
+            return redirect('users:login')
+        
+        if not default_token_generator.check_token(user, token):
+            messages.add_message(request,
+                                 messages.ERROR,
+                                 'Некорректная ссылка для восстановления пароля')
+            return redirect('users:login')
+        
+        form = RestorePasswordForm(user=user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request,
+                                 messages.SUCCESS,
+                                 'Пароль успешно изменен')
+            return redirect('users:login')
+        
+        return render(
+            request,
+            'users/restore-password.html',
+            {'form': form,
+             'uid': uid,
+             'token': token,
+            }
+        )
