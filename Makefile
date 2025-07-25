@@ -9,3 +9,27 @@ dev:
 
 prod-run:
 	uv run gunicorn -b 0.0.0.0:$(PORT) config.wsgi
+
+lint:
+	uv run ruff
+
+lint-fix:
+	uv run ruff check --fix
+
+redis:
+	redis-server
+
+celery:
+	uv run celery -A config worker --loglevel=info
+
+celery-beat:
+	uv run celery -A config beat --loglevel=info
+
+flower:
+	uv run celery -A config flower
+
+
+
+
+
+

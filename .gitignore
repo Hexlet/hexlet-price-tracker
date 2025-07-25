@@ -212,3 +212,8 @@ test_session.*
 
 # Temporary files
 tmp.*
+
+celerybeat-schedule*
+celerybeat-schedule.*
+
+dump.rdb

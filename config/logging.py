@@ -53,7 +53,7 @@ LOGGING = {
             "filters": ["require_debug_false"],
             "class": "logging.handlers.RotatingFileHandler",
             "filename": BASE_DIR / "errors.log",
-            "maxBytes": 10 * 1024 * 1024, # 10 MB максимальный размер
+            "maxBytes": 10 * 1024 * 1024,  # 10 MB максимальный размер
             "backupCount": 5,
             "formatter": "verbose",
         },
