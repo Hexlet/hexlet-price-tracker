@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import TemplateView
 
 from config.views import IndexView
 
@@ -26,4 +27,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('parser/', include('config.parser.urls')),
     path('admin/', admin.site.urls),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'))
 ]
