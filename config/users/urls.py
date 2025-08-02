@@ -4,11 +4,11 @@ from config.users.views import (
     AvatarChangeView,
     LoginView,
     LogoutView,
+    RestorePasswordRequestView,
+    RestorePasswordView,
     UserProfileView,
     UserRegister,
     UserUpdate,
-    RestorePasswordRequestView,
-    RestorePasswordView,
 )
 
 app_name = 'users'

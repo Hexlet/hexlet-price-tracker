@@ -1,4 +1,5 @@
 from django.db import models
+from config.users.models import User
 
 
 class TelegramChannel(models.Model):
@@ -26,6 +27,49 @@ class TelegramChannel(models.Model):
 
     def __str__(self):
         return f"{self.channel_id} канал {self.title}"
+
+
+class ChannelModerator(models.Model):
+    """Модель для связи пользователей с каналами в качестве модераторов"""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='moderated_channels',
+        verbose_name='Модератор'
+    )
+    channel = models.ForeignKey(
+        TelegramChannel,
+        on_delete=models.CASCADE,
+        related_name='moderators',
+        verbose_name='Канал'
+    )
+    is_owner = models.BooleanField(
+        default=False,
+        verbose_name='Владелец канала'
+    )
+    can_edit = models.BooleanField(
+        default=True,
+        verbose_name='Может редактировать'
+    )
+    can_delete = models.BooleanField(
+        default=False,
+        verbose_name='Может удалять'
+    )
+    can_manage_moderators = models.BooleanField(
+        default=False,
+        verbose_name='Может управлять модераторами'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата назначения')
+
+    class Meta:
+        verbose_name = 'Модератор канала'
+        verbose_name_plural = 'Модераторы каналов'
+        unique_together = ['user', 'channel']
+        db_table = 'channel_moderators'
+
+    def __str__(self):
+        role = 'Владелец' if self.is_owner else 'Модератор'
+        return f"{self.user} - {role} канала {self.channel.title}"
 
 
 class ChannelStats(models.Model):

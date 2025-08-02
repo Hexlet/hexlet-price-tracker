@@ -1,20 +1,17 @@
 import logging
 
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.contrib import messages
-from django.utils import timezone
-from django.views.generic import FormView, ListView, DetailView
-from django.conf import settings
-
 from asgiref.sync import async_to_sync
+from django.conf import settings
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views.generic import DetailView, FormView, ListView
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 
 from config.parser.forms import ChannelParseForm
+from config.parser.models import ChannelStats, TelegramChannel
 from config.parser.parser import tg_parser
-from config.parser.models import TelegramChannel, ChannelStats
-
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +84,6 @@ class ParserView(FormView):
         channel.save(update_fields=['parsed_at'])
         log.info(f'Для канала: {channel.title} записана статистика; '
                  f'- Подписчики: {current_count} прирост: {daily_growth}')
-
 
     def form_valid(self, form):
         """ Обработка формы """

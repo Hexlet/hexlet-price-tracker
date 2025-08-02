@@ -1,17 +1,17 @@
 import asyncio
-import time
-import random
-from telethon import TelegramClient
-from telethon.tl.functions.channels import GetFullChannelRequest
-from telethon.errors import (
-    FloodWaitError,
-    UsernameNotOccupiedError,
-    ChannelInvalidError,
-    AuthKeyError,
-    ForbiddenError,
-)
-
 import logging
+import random
+import time
+
+from telethon import TelegramClient
+from telethon.errors import (
+    AuthKeyError,
+    ChannelInvalidError,
+    FloodWaitError,
+    ForbiddenError,
+    UsernameNotOccupiedError,
+)
+from telethon.tl.functions.channels import GetFullChannelRequest
 
 log = logging.getLogger(__name__)
 
@@ -38,10 +38,10 @@ async def tg_parser(url: str, client: TelegramClient, limit: int = 10) -> dict:
         time.sleep(1)
         # получаем информацию о канале
         channel = await client.get_entity(url)
-        data['title'] = channel.title # название канала
-        data['channel_id'] = channel.id # id канала
-        data['username'] = channel.username # юзернейм канала
-        data['verified'] = channel.verified # верифицирован ли канал (булево)
+        data['title'] = channel.title  # название канала
+        data['channel_id'] = channel.id  # id канала
+        data['username'] = channel.username  # юзернейм канала
+        data['verified'] = channel.verified  # верифицирован ли канал (булево)
         # дата создания канала
         data['creation_date'] = channel.date.isoformat() if channel.date else None
         # получаем 10 последних постов из канала
@@ -60,9 +60,8 @@ async def tg_parser(url: str, client: TelegramClient, limit: int = 10) -> dict:
             average_views = total_views // total_posts
             data['average_views'] = average_views
 
-
     except FloodWaitError as e:
-        log.error(f'Сработал антифлуд, нужно подождать')
+        log.error('Сработал антифлуд, нужно подождать')
         # ждем рекомендуемое время + случайный промежуток
         await asyncio.sleep(e.seconds + random.uniform(1.0, 2.0))
 
@@ -73,10 +72,10 @@ async def tg_parser(url: str, client: TelegramClient, limit: int = 10) -> dict:
         log.error(f'Несуществующий юзернейм: {url}')
 
     except AuthKeyError:
-        log.critical(f'Проблемы с сессией авторизации')
+        log.critical('Проблемы с сессией авторизации')
 
-    #except Exception as e:
-        #print(f"Ошибка: {e}")
+    # except Exception as e:
+        # print(f"Ошибка: {e}")
 
     if channel:
 
@@ -85,12 +84,12 @@ async def tg_parser(url: str, client: TelegramClient, limit: int = 10) -> dict:
             full_channel = await client(GetFullChannelRequest(channel))
 
         except FloodWaitError as e:
-            log.error(f'Сработал антифлуд, нужно подождать')
+            log.error('Сработал антифлуд, нужно подождать')
             # ждем рекомендуемое время + случайный промежуток
             await asyncio.sleep(e.seconds + random.uniform(1.0, 2.0))
 
         except ForbiddenError:
-            log.warning(f'Ошибка доступа к полной информации канала')
+            log.warning('Ошибка доступа к полной информации канала')
 
         if full_channel:
             # получаем количество участников
